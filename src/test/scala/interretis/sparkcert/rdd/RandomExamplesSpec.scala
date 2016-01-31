@@ -29,15 +29,6 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
 
   private val numbers = Seq("1", "2", "3", "4", "5")
 
-  "fold" should "require the same return type as RDD" in { f =>
-    // given
-    val rdd = f.sc.parallelize(numbers)
-    // when
-    val result = rdd.fold("0")((acc, b) => (acc.toInt + b.toInt).toString)
-    // then
-    result shouldBe "15"
-  }
-
   "reduce" should "require the same return type as RDD" in { f =>
     // given
     val rdd = f.sc.parallelize(numbers)
@@ -47,6 +38,15 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     result shouldBe "15"
   }
 
+  "fold" should "require the same return type as RDD" in { f =>
+    // given
+    val rdd = f.sc.parallelize(numbers)
+    // when
+    val result = rdd.fold("0")((acc, b) => (acc.toInt + b.toInt).toString)
+    // then
+    result shouldBe "15"
+  }
+  
   "aggregate" should "not require the same return type as RDD" in { f =>
     // given
     val rdd = f.sc.parallelize(numbers)
