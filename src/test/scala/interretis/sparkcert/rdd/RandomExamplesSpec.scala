@@ -132,4 +132,16 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     // then
     result.collect() should contain theSameElementsAs Seq((1, 3), (3, 5), (3, 7))
   }
+
+  "per key average" should "be possible to compute with reduceByKey and mapValues" in { f =>
+    // given
+    val pairs = f.sc.parallelize(Seq(("panda", 0), ("pink", 3), ("pirate", 3), ("panda", 1), ("pink", 4)))
+    // when
+    val averages = pairs
+      .mapValues(d => (d, 1))
+      .reduceByKey((x, y) => (x._1 + y._1, x._2 + y._2))
+      .mapValues(n => 1.0 * n._1 / n._2)
+    // then
+    averages.collect() should contain theSameElementsAs Seq(("panda", 0.5), ("pirate", 3.0), ("pink", 3.5))
+  }
 }
