@@ -62,7 +62,7 @@
  </check>
  <check level="warning" class="org.scalastyle.scalariform.MagicNumberChecker" enabled="true">
   <parameters>
-   <parameter name="ignore"><![CDATA[-1,0,1,2,3]]></parameter>
+   <parameter name="ignore"><![CDATA[-1,0,1,2,3,"1","2"]]></parameter>
   </parameters>
  </check>
  <check level="warning" class="org.scalastyle.scalariform.NoWhitespaceBeforeLeftBracketChecker" enabled="true"></check>
@@ -135,7 +135,7 @@
  <check level="warning" class="org.scalastyle.scalariform.MultipleStringLiteralsChecker" enabled="true">
   <parameters>
    <parameter name="allowed"><![CDATA[2]]></parameter>
-   <parameter name="ignoreRegex"><![CDATA[^""$]]></parameter>
+   <parameter name="ignoreRegex"><![CDATA[^"\d"$]]></parameter>
   </parameters>
  </check>
  <check level="warning" class="org.scalastyle.scalariform.ImportGroupingChecker" enabled="true"></check>

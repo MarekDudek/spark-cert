@@ -59,15 +59,28 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
   private val file1 = "src/main/resources/file1.txt"
   private val file2 = "src/main/resources/file2.txt"
 
-  "example with join" should "work" in { f =>
+  "example with join" should "show how it works precisely" in { f =>
     // given
     val occurences1 = f.sc.textFile(file1).flatMap(l => l.split(",")).map(w => (w, 1))
     val occurences2 = f.sc.textFile(file2).flatMap(l => l.split(",")).map(w => (w, 1))
-    // when
-    val joined = occurences1 join occurences2
-    // then
     occurences1.collect() should contain theSameElementsAs Seq(("1", 1), (" b", 1), ("c", 1), ("d", 1), ("2", 1), (" a", 1), ("b", 1), ("c", 1))
     occurences2.collect() should contain theSameElementsAs Seq(("1", 1), (" hadoopexam.com", 1), ("2", 1), (" quicktechie.com", 1))
-    joined.collect() should contain theSameElementsAs Seq(("1", (1, 1)), ("2", (1, 1)))
+    // when
+    val innerJoin = occurences1 join occurences2
+    innerJoin.collect() should contain theSameElementsAs Seq(("1", (1, 1)), ("2", (1, 1)))
+
+    val outerJoin = occurences1 fullOuterJoin occurences2 cache()
+    outerJoin.collect() should contain("b", (Some(1), None))
+    outerJoin.collect() should contain(" hadoopexam.com", (None, Some(1)))
+
+    val leftJoin = occurences1 leftOuterJoin occurences2
+    val rightJoinRev = occurences2 rightOuterJoin occurences1
+    val rightJoinRevSwapped = rightJoinRev.map { a => val (k, (l, r)) = a; (k, (r, l)) }
+    leftJoin.collect() should contain theSameElementsAs rightJoinRevSwapped.collect()
+
+    val rightJoin = occurences1 rightOuterJoin occurences2
+    val leftJoinRev = occurences2 leftOuterJoin occurences1
+    val leftJoinRevSwapped = leftJoinRev.map { a => val (k, (l, r)) = a; (k, (r, l)) }
+    rightJoin.collect() should contain theSameElementsAs leftJoinRevSwapped.collect()
   }
 }
