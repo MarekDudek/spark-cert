@@ -134,8 +134,9 @@
  <check level="warning" class="org.scalastyle.scalariform.LowercasePatternMatchChecker" enabled="true"></check>
  <check level="warning" class="org.scalastyle.scalariform.MultipleStringLiteralsChecker" enabled="true">
   <parameters>
-   <parameter name="allowed"><![CDATA[2]]></parameter>
-   <parameter name="ignoreRegex"><![CDATA[^"\d"$]]></parameter>
+   <parameter name="allowed"><![CDATA[4]]></parameter>
+   <parameter name="ignoreRegex"><![CDATA[^"[1-9]"$]]></parameter>
+   <parameter name="ignoreRegex"><![CDATA[^"[a-z]"$]]></parameter>
   </parameters>
  </check>
  <check level="warning" class="org.scalastyle.scalariform.ImportGroupingChecker" enabled="true"></check>

@@ -83,4 +83,10 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     val leftJoinRevSwapped = leftJoinRev.map { a => val (k, (l, r)) = a; (k, (r, l)) }
     rightJoin.collect() should contain theSameElementsAs leftJoinRevSwapped.collect()
   }
+
+  "groupByKey" should "be fed function of proper signature" in { f =>
+    val pairs = f.sc.parallelize(Seq((1, "a"), (2, "b"), (1, "c")))
+    val result = pairs.groupByKey()
+    result.collect() should contain theSameElementsAs Seq((1, Seq("a", "c")), (2, Seq("b")))
+  }
 }
