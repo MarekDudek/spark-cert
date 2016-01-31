@@ -123,4 +123,13 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
       ('d', (Nil, Seq(8)))
     )
   }
+
+  "mapValues" should "be painfully self-explanatory" in { f =>
+    // given
+    val rdd = f.sc.parallelize(Seq((1, 2), (3, 4), (3, 6)))
+    // when
+    val result = rdd.mapValues(_ + 1)
+    // then
+    result.collect() should contain theSameElementsAs Seq((1, 3), (3, 5), (3, 7))
+  }
 }
