@@ -46,7 +46,7 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     // then
     result shouldBe "15"
   }
-  
+
   "aggregate" should "not require the same return type as RDD" in { f =>
     // given
     val rdd = f.sc.parallelize(numbers)
@@ -54,5 +54,20 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     val result = rdd.aggregate(0)((u, t) => u + t.toInt, (u1, u2) => u1 + u2)
     // then
     result shouldBe 15
+  }
+
+  private val file1 = "src/main/resources/file1.txt"
+  private val file2 = "src/main/resources/file2.txt"
+
+  "example with join" should "work" in { f =>
+    // given
+    val occurences1 = f.sc.textFile(file1).flatMap(l => l.split(",")).map(w => (w, 1))
+    val occurences2 = f.sc.textFile(file2).flatMap(l => l.split(",")).map(w => (w, 1))
+    // when
+    val joined = occurences1 join occurences2
+    // then
+    occurences1.collect() should contain theSameElementsAs Seq(("1", 1), (" b", 1), ("c", 1), ("d", 1), ("2", 1), (" a", 1), ("b", 1), ("c", 1))
+    occurences2.collect() should contain theSameElementsAs Seq(("1", 1), (" hadoopexam.com", 1), ("2", 1), (" quicktechie.com", 1))
+    joined.collect() should contain theSameElementsAs Seq(("1", (1, 1)), ("2", (1, 1)))
   }
 }
