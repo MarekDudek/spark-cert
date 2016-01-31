@@ -26,4 +26,33 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     // then
     union.collect() should contain theSameElementsAs words1 ++ words2
   }
+
+  private val numbers = Seq("1", "2", "3", "4", "5")
+
+  "fold" should "require the same return type as RDD" in { f =>
+    // given
+    val rdd = f.sc.parallelize(numbers)
+    // when
+    val result = rdd.fold("0")((acc, b) => (acc.toInt + b.toInt).toString)
+    // then
+    result shouldBe "15"
+  }
+
+  "reduce" should "require the same return type as RDD" in { f =>
+    // given
+    val rdd = f.sc.parallelize(numbers)
+    // when
+    val result = rdd.reduce((acc, b) => (acc.toInt + b.toInt).toString)
+    // then
+    result shouldBe "15"
+  }
+
+  "aggregate" should "not require the same return type as RDD" in { f =>
+    // given
+    val rdd = f.sc.parallelize(numbers)
+    // when
+    val result = rdd.aggregate(0)((u, t) => u + t.toInt, (u1, u2) => u1 + u2)
+    // then
+    result shouldBe 15
+  }
 }
