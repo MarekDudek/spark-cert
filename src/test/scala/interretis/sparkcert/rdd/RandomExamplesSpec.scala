@@ -97,7 +97,7 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     result.collect() should contain theSameElementsAs Seq(("a", 4), ("b", 2))
   }
 
-  "join with multiple occurances" should "work" in { f =>
+  "cogroup" should "work" in { f =>
     // given
     val rdd1 = f.sc.parallelize(Seq(('a', 1), ('b', 2), ('a', 3), ('c', 4)))
     val rdd2 = f.sc.parallelize(Seq(('a', 5), ('b', 6), ('a', 7), ('d', 8)))
