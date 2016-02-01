@@ -144,4 +144,29 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     // then
     averages.collect() should contain theSameElementsAs Seq(("panda", 0.5), ("pirate", 3.0), ("pink", 3.5))
   }
+
+  "per key average" should "be possible to compute with combine by key" in { f =>
+    // given
+    val pairs = f.sc.parallelize(Seq(("panda", 0), ("pink", 3), ("pirate", 3), ("panda", 1), ("pink", 4)))
+    // when
+    val averages = pairs.combineByKey(
+      createCombiner =
+        v => v -> 1,
+      mergeValue =
+        (c: (Int, Int), v) => {
+          val (sum, count) = c
+          (sum + v) -> (count + 1)
+        },
+      mergeCombiners =
+        (c1: (Int, Int), c2: (Int, Int)) => {
+          val ((sum1, count1), (sum2, count2)) = (c1, c2)
+          (sum1 + sum2) -> (count1 + count2)
+        }
+    ).mapValues(c => {
+      val (sum, count) = c
+      (sum: Float) / count
+    })
+    // then
+    averages.collect() should contain theSameElementsAs Seq(("panda", 0.5), ("pirate", 3.0), ("pink", 3.5))
+  }
 }
