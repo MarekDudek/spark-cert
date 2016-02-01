@@ -97,6 +97,12 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     result.collect() should contain theSameElementsAs Seq(("a", 4), ("b", 2))
   }
 
+  "reduceByKey" should "be possible to implement using groupByKey" in { f =>
+    val pairs = f.sc.parallelize(Seq(("a", 1), ("b", 2), ("a", 3)))
+    val result = pairs.groupByKey().mapValues(values => values.reduce(_ + _))
+    result.collect() should contain theSameElementsAs Seq(("a", 4), ("b", 2))
+  }
+
   "cogroup" should "work" in { f =>
     // given
     val rdd1 = f.sc.parallelize(Seq(('a', 1), ('b', 2), ('a', 3), ('c', 4)))
