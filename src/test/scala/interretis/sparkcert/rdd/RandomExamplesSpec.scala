@@ -187,4 +187,13 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     // then
     averages.collect() should contain theSameElementsAs Seq(("panda", 0.5), ("pirate", 3.0), ("pink", 3.5))
   }
+
+  "lookup" should "return all matching values" in { f =>
+    // given
+    val rdd = f.sc.parallelize(Seq((1, 2), (3, 4), (3, 6)))
+    // when
+    val values = rdd.lookup(3)
+    // then
+    values shouldBe Seq(4, 6)
+  }
 }
