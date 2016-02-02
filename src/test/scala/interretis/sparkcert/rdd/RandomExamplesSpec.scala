@@ -130,6 +130,18 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     )
   }
 
+  "cogroup" should "work with three RDDs" in { f =>
+    // given
+    val rdd1 = f.sc.parallelize(Seq(('a', 1), ('b', 2), ('a', 3), ('c', 4)))
+    val rdd2 = f.sc.parallelize(Seq(('a', 5), ('b', 6), ('a', 7), ('d', 8)))
+    val rdd3 = f.sc.parallelize(Seq(('a', 9), ('e', 10), ('c', 11), ('d', 12)))
+    // when
+    val grouped = rdd1.cogroup(rdd1, rdd2)
+    // then
+    grouped.collect().foreach(println)
+
+  }
+
   "mapValues" should "be painfully self-explanatory" in { f =>
     // given
     val rdd = f.sc.parallelize(Seq((1, 2), (3, 4), (3, 6)))
