@@ -1,8 +1,11 @@
 package interretis.sparkcert.rdd
 
+import interretis.sparkcert.rdd.Example.{LinkInfo, UserInfo, UserID}
 import interretis.sparktesting.SeparateContext
+import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.scalatest.Matchers
+
 
 class RandomExamplesSpec extends SeparateContext with Matchers {
 
@@ -196,4 +199,29 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     // then
     values shouldBe Seq(4, 6)
   }
+
+  "local RDD" should "do really have no idea what" in { f =>
+
+    val userData = f.sc.sequenceFile[UserID, UserInfo]("some-path", classOf[UserID], classOf[UserInfo])
+
+    def processNewLogs(logFileName: String): Unit = {
+      val events = f.sc.sequenceFile[UserID, LinkInfo](logFileName, classOf[UserID], classOf[LinkInfo]).partitionBy(new HashPartitioner(100))
+      val joined = userData.join(events)
+      val offTopicVisits = joined.filter {
+        case (userID, (userInfo, linkInfo)) => userID.id % 3 == 0
+      }.count()
+      println("Number of visits to non-subscribed topics: " + offTopicVisits)
+    }
+
+  }
+}
+
+object Example {
+
+  case class UserID(id: Int)
+
+  case class UserInfo(name: String)
+
+  case class LinkInfo(link: String)
+
 }
