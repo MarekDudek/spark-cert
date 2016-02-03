@@ -214,6 +214,22 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     }
 
   }
+
+  "CVS header example" should "have some useful knowledge in it" in { f =>
+    val csv = f.sc.textFile("src/main/resources/with-header.csv")
+    val data = csv.map(line => line.split(",").map(elem => elem.trim))
+    val header = new SimpleCSVHeader(data.take(1)(0))
+    val rows = data.filter(line => header(line, "user") != "user")
+    val users = rows.map(row => header(row, "user"))
+    val usersByHits = rows.map(row => header(row, "user") -> header(row, "hits").toInt)
+    usersByHits.collect().foreach(println)
+  }
+}
+
+class SimpleCSVHeader(header: Array[String]) extends Serializable {
+  private val index = header.zipWithIndex.toMap
+  def apply(array: Array[String], key: String): String =
+    array(index(key))
 }
 
 object Example {
