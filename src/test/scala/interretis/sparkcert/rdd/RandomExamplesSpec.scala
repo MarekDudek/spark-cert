@@ -222,12 +222,21 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     val rows = data.filter(line => header(line, "user") != "user")
     val users = rows.map(row => header(row, "user"))
     val usersByHits = rows.map(row => header(row, "user") -> header(row, "hits").toInt)
-    usersByHits.collect().foreach(println)
+    usersByHits.collect() should have length 3
+  }
+
+  "first two columns" should "be extracted" in { f =>
+    val twoColumns = f.sc.textFile("src/main/resources/with-header.csv")
+      .map(line => line.split(","))
+      .filter(line => line.length > 1)
+      .map(line => (line(0), line(1)))
+    twoColumns.collect() should have length 4
   }
 }
 
 class SimpleCSVHeader(header: Array[String]) extends Serializable {
   private val index = header.zipWithIndex.toMap
+
   def apply(array: Array[String], key: String): String =
     array(index(key))
 }
