@@ -18,3 +18,10 @@ libraryDependencies ++= Seq(
 scalastyleConfig := file("project/scalastyle_config.xml")
 
 parallelExecution in Test := false
+
+mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
+{
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case x => MergeStrategy.first
+}
+}
