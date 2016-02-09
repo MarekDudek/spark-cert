@@ -19,6 +19,8 @@ class SqlExamples extends SeparateSqlContext with Matchers {
     df.registerTempTable("records")
     val records = f.sqlCtx.sql("SELECT * FROM records")
     records.collect() should have length 100
+    val keys = records.map(row => s"${row(0)}")
+    keys.collect() should have length 100
   }
 }
 
