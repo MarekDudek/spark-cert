@@ -6,6 +6,8 @@ import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.scalatest.Matchers
 
+import scala.util.Random
+
 
 class RandomExamplesSpec extends SeparateContext with Matchers {
 
@@ -231,6 +233,25 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
       .filter(line => line.length > 1)
       .map(line => (line(0), line(1)))
     twoColumns.collect() should have length 4
+  }
+
+  "random" should "work" in { f =>
+    val numMappers = 2
+    val numKVPairs = 1000
+    val valSize = 1000
+    var numReducers = numMappers
+    val pairs = f.sc.parallelize(0 until numMappers, numMappers).flatMap {
+      p =>
+        val ranGen = new Random
+        val arr = new Array[(Int, Array[Byte])](numKVPairs)
+        for (i <- 0 until numKVPairs) {
+          val byteArr = new Array[Byte](valSize)
+          ranGen.nextBytes(byteArr)
+          arr(i) = (ranGen.nextInt(Int.MaxValue), byteArr)
+        }
+        arr
+    }.cache()
+    pairs.count() shouldBe numMappers * numKVPairs
   }
 }
 
