@@ -90,6 +90,23 @@ class RandomExamplesSpec extends SeparateContext with Matchers {
     rightJoin.collect() should contain theSameElementsAs leftJoinRevSwapped.collect()
   }
 
+  "example with join and group" should "work" in { f =>
+    // given
+    val i1 = Item("1", "first", 2, "c1")
+    val i2 = i1.copy(id = "2", name = "second")
+    val i3 = i1.copy(id = "3", name = "third", companyId = "c2")
+    val items = f.sc.parallelize(List(i1, i2, i3))
+    val c1 = Company("c1", "company-1", "city-1")
+    val c2 = Company("c2", "company-2", "city-2")
+    val companies = f.sc.parallelize(List(c1, c2))
+    // when
+    val groupedItems = items.groupBy(x => x.companyId)
+    val groupedCompanies = companies.groupBy(x => x.companyId)
+    val joined = groupedItems.join(groupedCompanies)
+    joined.collect() should contain(("c1", (Seq(i1, i2), Seq(c1))))
+    joined.collect() should contain(("c2", (Seq(i3), Seq(c2))))
+  }
+
   "groupByKey" should "return RDD of proper signature" in { f =>
     val pairs = f.sc.parallelize(Seq((1, "a"), (2, "b"), (1, "c")))
     val result: RDD[(Int, Iterable[String])] = pairs.groupByKey()
@@ -271,3 +288,7 @@ object Example {
   case class LinkInfo(link: String)
 
 }
+
+case class Item(id: String, name: String, unit: Int, companyId: String)
+
+case class Company(companyId: String, name: String, city: String)
